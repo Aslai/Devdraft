@@ -7,11 +7,27 @@
 #define USE_FILESTREAMS
 const uint64_t Mask32Bit = 0xFFFFFFFFull;
 
+//!Note to readers of my code:
+//!
+//!I willfully used some magic numbers in array access relating to accessing the numbers for the game.
+//!I figured that the amount of work required to make the game work for N digits is far beyond the scope of
+//!this challenge, and my entire algorithm would crash and burn if you tried to use it on any other
+//!number of inputs.
+//!
+
 class Number{
+    //This is just a very simple big integer implementation. I only implemented functionality as needed for
+    //the project, and it isn't really fit for any other use. I won't stop anyone from expanding upon it, but
+    //even the GMP is less painful to use than this.
+    //
+    //!THIS IS A MUTABLE TYPE! OPERATIONS PERFORMED ON INSTANCES AFFECT THE INSTANCE IN QUESTION AND WILL NOT
+    //!CREATE AN IMMUTABLE COPY! You have been warned.
+
+
     std::vector<uint64_t> data;
     public:
-    Number( int precision = 0 ){
-        data.resize( precision/32, 0 );
+    Number(){
+
     }
     Number( const Number& other ){
         data = other.data;
@@ -19,6 +35,8 @@ class Number{
     int Compare( Number& value ){
         int i = data.size();
         int j = value.data.size();
+        //Start one of the counters at a negative index to keep the numbers aligned to their correct place.
+        //Negative offsets just get treated as holding a value of 0.
         if( i < j ){
             i -= j;
             j = 0;
@@ -41,7 +59,7 @@ class Number{
         }
         return 0;
     }
-    Number& AddSelf( uint32_t value ){
+    Number& Add( uint32_t value ){
 
         if( data.size() == 0 )
         {
@@ -61,7 +79,8 @@ class Number{
         }
         return *this;
     }
-    Number& AddSelf( Number& value ){
+    Number& Add( Number& value ){
+        //For simplicity's sake, make both the numbers equally sized.
         while( data.size() < value.data.size() ){
             data.insert( data.begin(), 0 );
         }
@@ -71,10 +90,11 @@ class Number{
         for( size_t i = 0; i < data.size(); ++i ){
             data[i] += value.data[i] & Mask32Bit;
         }
-        AddSelf(0); //AddSelf automatically handles carry propagation
+        Add(0); //Add automatically handles carry propagation
         return *this;
     }
-    Number& SubtractSelf( Number& value ){
+    Number& Subtract( Number& value ){
+        //For simplicity's sake, make both the numbers equally sized.
         while( data.size() < value.data.size() ){
             data.insert( data.begin(), 0 );
         }
@@ -102,20 +122,21 @@ class Number{
         return *this;
     }
 
-    Number& MultiplySelf( uint32_t value ){
+    Number& Multiply( uint32_t value ){
         for( size_t i = 0; i < data.size(); ++i ){
             data[i] *= value;
         }
-        AddSelf(0); //AddSelf automatically handles carry propagation
+        Add(0); //Add automatically handles carry propagation
 
         return *this;
     }
-    Number& SetSelf( std::string value ){
+    Number& Set( std::string value ){
+        //Fill the internal binary structure with a decimal integer represented by a string
         data.clear();
         for( size_t i = 0; i < value.length(); ++i ){
             if( value[i] >= '0' && value[i] <= '9' ){
-                MultiplySelf( 10 );
-                AddSelf( value[i] - '0' );
+                Multiply( 10 );
+                Add( value[i] - '0' );
             }
         }
         return *this;
@@ -127,7 +148,7 @@ std::vector<Range> Patterns;
 
 
 void DeterminePattern(){
-    //This can be determined more trivially, but the algorithm is left as is because it's fast enough and more clear.
+    //This can be determined more trivially, but the algorithm is left as-is because it's fast enough and more clear.
     //The pattern is simply:
     //0x1
     //0x3
@@ -142,29 +163,36 @@ void DeterminePattern(){
     //0xAAAAB
     //... And on forever
     Range patternrange;
-    Number n(0), prev(0);
-    Number one(0);
-    one.SetSelf("1");
-    prev.SetSelf( "1" );
-    n.SetSelf( "3" );
+    Number n, prev;
+    Number one;
+    one.Set("1");
+    prev.Set( "1" );
+    n.Set( "3" );
+
+    //Hardcode the first region for convenience
     patternrange.Minimum = prev;
     patternrange.Maximum = prev;
     Patterns.push_back( patternrange );
-    Number maximum(0);
-    maximum.SetSelf("10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
+    Number maximum;
+    //Store pattern info all the way up to 10^100 since provided numbers are defined as 0 <= T <= 10^100
+    maximum.Set("10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
     while( n.Compare( maximum ) < 0 ){
+        //Get the end of the region where second move advantages occur
         Number diff = n;
+        diff.Add( n );
+        diff.Subtract( one );
 
+        //Store it for later use
         patternrange.Minimum = n;
-        diff.AddSelf( n );
-        diff.SubtractSelf( one );
         patternrange.Maximum = diff;
-        diff = n;
-        diff.SubtractSelf( prev );
-        diff.MultiplySelf( 4 );
-        prev = n;
-        n.AddSelf( diff );
         Patterns.push_back( patternrange );
+
+        //Find the beginning of the next region
+        diff = n;
+        diff.Subtract( prev );
+        diff.Multiply( 4 );
+        prev = n;
+        n.Add( diff );
     }
 }
 
@@ -175,41 +203,71 @@ enum GameState{
 
 
 GameState CheckMovesFast(std::vector<Number> numbers){
+    //The meat of the implementation.
+    //The methods and math used are derived from observed behavior of the output from a previous iteration of this function.
+    //Honestly, I don't know WHY this method works, but it works according to spec as far as I can tell.
+    //This is merely my attempt to recreate the behavior of the data in a highly efficient manner.
+    //I derive no pleasure from fostering this black magic, but it's so fast!
 
+    //Ensure that the edge case of all identical numbers is handled immediately
     if( numbers[1].Compare(numbers[2]) == 0 && numbers[1].Compare(numbers[0]) == 0 )
         return GoSecond;
-    numbers[2].SubtractSelf(numbers[1]);
 
-    numbers[1].SubtractSelf(numbers[0]);
+    //Get the difference between number 1 and number 2, and the difference between number 0 and number 1.
+    //Sort them in ascending order.
+    //From this point on, numbers[0] is scratch space.
+    numbers[2].Subtract(numbers[1]);
+    numbers[1].Subtract(numbers[0]);
+    //From this point on, numbers[0] is scratch space.
     if( numbers[1].Compare(numbers[2]) > 0 ){
         numbers[0] = numbers[1];
         numbers[1] = numbers[2];
         numbers[2] = numbers[0];
     }
 
+    //Find which area of the pattern the larger of the two differences falls in.
     size_t i;
     for(i = 0; i < Patterns.size() && Patterns[i].Maximum.Compare(numbers[2]) < 0; ++i ){};
+    //If it's not actually in the range of this area of the pattern, go first.
     if( Patterns[i].Minimum.Compare(numbers[2]) > 0 )
         return GoFirst;
+
+    //Store the maximum extent of the current pattern region for later use
     numbers[0] = Patterns[i].Maximum;
+
+    //Find which area of the pattern the smaller of the two differences falls in.
     for(i = 0; i < Patterns.size() && Patterns[i].Maximum.Compare(numbers[1]) < 0; ++i ){};
+    //If it's not actually in the range of this area of the pattern, go first.
     if( Patterns[i].Minimum.Compare(numbers[1]) > 0 )
         return GoFirst;
-    Number num1plus1(0);
+
+    Number num1plus1;
     num1plus1 = numbers[1];
-    num1plus1.AddSelf( 1 );
+    num1plus1.Add( 1 );
+
+    //Special case: When the two differences are equal, or the larger one is only one unit ahead of the smaller
+    //difference, then I believe that going second is guaranteed to allow a forced victory.
     if( numbers[1].Compare(numbers[2]) != 0 && num1plus1.Compare(numbers[2]) != 0){
-        numbers[0].SubtractSelf(numbers[1]);
+        //Another special case: When the value of the large difference is greater than the value of the farthest reach
+        //of the current pattern area MINUS the value of the smaller difference, I believe going first allows you to force a victory.
+        //Confusing? I think so. Essentially, if your two differences are 9 and 80, then the large difference is in
+        //the 43-85 template area. The furthest extent is 85, so 85-9=76. 76 is smaller than 80, so we need to go first
+        //in order to force victory.
+
+        numbers[0].Subtract(numbers[1]);
         if( numbers[0].Compare( numbers[2] ) < 0 ){
             return GoFirst;
         }
     }
+
+    //If we've made it through all of that, then we go second to force a victory.
     return GoSecond;
 }
 
 int main(){
     DeterminePattern();
-    char buffer[10000];
+    char buffer[10000]; //The spec specifies 10^100 as the largest possible number,
+                        //so only 303 characters are really needed.
     #ifdef USE_FILESTREAMS
     freopen( "input.txt", "r", stdin );
     freopen( "output.txt", "w", stdout );
@@ -218,6 +276,9 @@ int main(){
     int rounds = 0;
     int result = sscanf( buffer, "%d", &rounds );
     if( result == 0 || rounds < 0 ){
+        //Invalid input was supplied at this point.
+        //The behavior in the situation is undefined, so I figured that I would supply an informative
+        //error message instead of failing silently.
         printf("Failure: Invalid round count specified,\r\n");
         return 1;
     }
@@ -237,10 +298,11 @@ int main(){
                 return 1;
             }
             std::string num = stringbuffer.substr(start, position - start);
-            numbers[i].SetSelf( num );
+            numbers[i].Set( num );
 
             position++;
         }
+        //Sort the array of numbers in ascending order
         Number temp;
         if( numbers[0].Compare(numbers[1]) > 0 ){
             temp = numbers[0];
@@ -258,9 +320,9 @@ int main(){
             numbers[1] = temp;
         }
 
-        GameState first = CheckMovesFast( numbers );
+        GameState state = CheckMovesFast( numbers );
 
-        if( first == GoFirst ){
+        if( state == GoFirst ){
             printf("First\n");
         }
         else {
