@@ -1,3 +1,4 @@
+//I'm a sucker for C I/O
 #include<stdint.h>
 #include<vector>
 #include<string>
@@ -196,6 +197,7 @@ void DeterminePattern(){
     }
 }
 
+//I should be using a scoped enum here...
 enum GameState{
     GoSecond,
     GoFirst
@@ -215,7 +217,6 @@ GameState CheckMovesFast(std::vector<Number> numbers){
 
     //Get the difference between number 1 and number 2, and the difference between number 0 and number 1.
     //Sort them in ascending order.
-    //From this point on, numbers[0] is scratch space.
     numbers[2].Subtract(numbers[1]);
     numbers[1].Subtract(numbers[0]);
     //From this point on, numbers[0] is scratch space.
