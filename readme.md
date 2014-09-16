@@ -3,7 +3,7 @@ __Devdraft Numbers Game submission__
 
 
 -------------------------------------------------------------------
-__Background __
+__Background__
 -------------------------------------------------------------------
 I lurk on Craigslist every day looking for potential job openings 
 for someone as green as myself. There was an ad for Devdraft, and 
@@ -25,7 +25,7 @@ nanoseconds.
 -------------------------------------------------------------------
 __My Thought and Work Process__
 -------------------------------------------------------------------
-##Starting Off##
+####Starting Off####
 
 The first thing I thought about was how I would represent numbers as 
 large as 10^100. I'd never written a big number object like this 
@@ -54,30 +54,30 @@ small numbers through it (It might be slow, but it's still thousands
 of times faster than doing it by hand). 
 
 -------------------------------------------------------------------
-##A Very Handy Simplification##
+####A Very Handy Simplification####
 
 Very early on in the process, I realized that the three number input
 can be boiled down to to something even more basic. Since the game 
 just involves splitting the difference between the three numbers 
-provided, I realized that I could take the difference of the three 
-numbers, discard the three numbers, and yet lose no necessary 
-information in the process. This removed an entire input from the 
-function I was being asked to replicate, reducing the data set to 
-a two dimensional one (from three dimensions). That saved a lot of 
-headache. 
+provided, I realized that I could manipulate just the differences of
+the three numbers, and lose no necessary information in the process. 
+This removed an entire input from the function I was being asked to
+replicate, reducing the data set to a two dimensional plane (from 
+three dimensions). That saved me a lot of headache. 
 
 From there, I tried for hours trying to somehow relate the numbers 
 I was getting to a pure mathematical function. One thing that really
 stuck out to me was that rounds that you can force the game from the
 second move tended to have a lot of primes in the numbers. 99 times 
 out of 100, numbers that favored a second move had multiple primes 
-in the numbers I was looking at. I couldn't help but shake the idea 
-of the potential significance of this. In a challenge like the one 
+in the numbers I was looking at. I couldn't shake the idea of the
+potential significance of this. In a challenge like the one 
 presented, coming up with an efficient way to find and verify primes
-can always be a real time sink. 
+can always be a real time sink, so I wouldn't be surprised if that
+was a goal of the challenge designers.
 
 -------------------------------------------------------------------
-##Time for some Serious Examination##
+####Time for some Serious Examination####
 
 Later, I decided to just run as much organized data as I could 
 through the solution I had made. Once I had 10000 elements to look 
@@ -106,10 +106,10 @@ gaps, until I finally realized that each chunk was as long as the
 value of the first number in that chunk. By that, I mean that the 
 chunk of data with 11 as the first number in the set was 11 numbers
 long. I figured it would break down with the chunk starting at 43,
-but it held there, too.
+but my theory held firm there as well.
 
 With this new information, I started the program back up, only this 
-time I had it crunch the lower 1000x1000 unit dimension to see if I
+time I had it crunch the lower 1000x1000 unit plane to see if I
 could get the next number in this sequence. While that was chugging 
 along, I spent far too long looking at a table of prime numbers 
 trying to relate the sequence to itself. It eventually proved 
@@ -118,7 +118,7 @@ was going to take about an hour to crunch all the data I wanted the
 program to take care of, so I took a relaxing DotA break.
 
 -------------------------------------------------------------------
-##The Info I was Looking for All Along##
+####The Info I was Looking for All Along####
 
 When the task finally finished, I eagerly began to thumb through the 
 data it had produced. The next numbers in the sequence were... 171 
@@ -159,11 +159,11 @@ fall into traps where the you excuse discrepancies in the patterns
 you're seeing due to confirmation bias. I also feel really weird
 having written code that appears to work, but I honestly don't know 
 if it's 100% correct. I ran it through various test cases as 
-rigorously as I could with my naïve implementation, but what if even
-my naïve implementation was partially incorrect? What if the pattern
-holds all the way up to 1000x1000 (which is the furthest extent I 
-tested it to) but breaks down at 1001x1001? This is the most 
-ambivalent I've ever been about software I've written.
+rigorously as I could provide with my naïve implementation, but what 
+if even my naïve implementation was partially incorrect? What if the 
+pattern holds all the way up to 1000x1000 (which is the furthest 
+extent I tested it to) but breaks down at 1001x1001? This is the most 
+ambivalent I've ever been about any piece of software I've written.
 
 Hopefully I manage to collect all the points with this crazy piece 
 of code!
