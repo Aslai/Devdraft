@@ -1,0 +1,39 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+*.exe
+*.lnk
+
+# Compiled Static libraries
+*.lai
+*.la
+
+# Images
+*.jpg
+*.bmp
+*.png
+
+# Other
+*.bin
+*.bak
+*.depend
+*.layout
+*.zip
+
+*.txt
+*.Cache
+*.resources
+*.cache
+*.pdb
+*.manifest
+*.7z
+*.res
+*.cfg
+*.bat
+*.gif
