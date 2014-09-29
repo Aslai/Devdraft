@@ -1,0 +1,25 @@
+8-8: Square
+8-15: >
+8-22: >
+8-29: >
+8-36: >
+
+9-3: double fish
+9-5: fish
+9-7: double fish
+9-9: half fish
+9-11: double fish
+9-13: fish
+9-15: double fish
+9-17: half fish
+9-19: double fish
+9-21: fish
+9-23: double fish
+9-25: half fish
+9-27: double fish
+2-29: fish
+9-31: double fish
+9-33: half fish
+9-35: double fish
+9-37: fish
+9-39: double fish

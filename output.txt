@@ -1,34 +1,52 @@
-Second
-First
-First
-First
-First
-First
-First
-First
-Second
-First
-First
-First
-Second
-First
-First
-First
-First
-First
-First
-Second
-Second
-First
-Second
-First
-First
-Second
-First
-First
-First
-Second
-Second
-First
-First
-Second
+6 6 4
+2 2 5
+2 4 1
+1 4 7
+2 3 8
+
+8 3 3
+2 1 1
+5 2 4
+6 2 7
+
+8 3 3
+2 1 9
+5 2 4
+6 2 7
+
+8 3 3
+2 1 9
+5 2 4
+7 2 7
+
+18 27 15
+18 12 3
+8 26 28
+4 17 19
+16 27 13
+2 26 9
+17 18 2
+18 26 5
+12 2 24
+0 23 6
+5 9 6
+18 16 28
+0 27 3
+16 10 5
+0 24 1
+17 17 18
+
+10 7 12
+2 2 9
+8 1 5
+5 7 3
+4 1 1
+10 2 10
+1 3 21
+2 7 10
+9 7 23
+1 4 19
+7 2 3
+8 7 13
+2 1 24
+
