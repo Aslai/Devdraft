@@ -265,7 +265,9 @@ GameState CheckMovesFast(std::vector<Number> numbers){
     return GoSecond;
 }
 
-int main(){
+#include<windows.h>
+
+int main1(){
     DeterminePattern();
     char buffer[10000]; //The spec specifies 10^100 as the largest possible number,
                         //so only 303 characters are really needed.
@@ -329,6 +331,9 @@ int main(){
         else {
             printf("Second\n");
         }
+    }
+    while(1){
+        Sleep(1000);
     }
     return 0;
 }

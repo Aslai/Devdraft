@@ -29,9 +29,11 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-std=c++11" />
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="main.cpp" />
+		<Unit filename="part1.cpp" />
+		<Unit filename="part2.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
