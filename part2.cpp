@@ -16,10 +16,61 @@ struct Field{
     std::vector<Coin> coins;
 };
 
+struct Speed{
+    int x, y;
+};
+
 int compute( Field f ){
-    printf("%d %d %d\n", f.width, f.height, f.coins.size() );
-    for( int i = 0; i < f.coins.size(); ++i ){
-        printf("%d %d %d\n", f.coins[i].x, f.coins[i].y, f.coins[i].value);
+    int major = f.width;
+    int minor = f.height;
+    if( minor > major ){
+        major = f.height;
+        minor = f.width;
+    }
+
+    std::vector<int> classes(minor, 0);
+    int classnumber = 1;
+
+    for( int xstart = 0; xstart < minor; ++xstart ){
+        if( classes[xstart] != 0 )
+            continue;
+        Speed s = {1, 1};
+        if( minor == 1 ){
+            s.y = 0;
+        }
+        if( major == 1 ){
+            s.x = 0;
+        }
+
+        Speed start = s;
+        int x = xstart;
+        int y = 0;
+        int step = 0;
+        do{
+            ++step;
+            if( y == 0 && classes[x] > 0 ){
+                classes[xstart] = classes[x];
+            }
+            x += s.x;
+            if( x <= 0 || x >= minor-1 ){ //Bounce off of vertical walls
+                s.x = -s.x;
+            }
+            y += s.y;
+            if( y < 0 || y >= major ){ //Bounce off of horizontal walls
+                s.y = -s.y;
+            }
+        } while(    step < 5 ||
+                  !(x == xstart && //While not back at the start with the starting speed
+                    y == 0 &&
+                    s.x == start.x &&
+                    s.y == start.y) );
+
+        if( classes[xstart] == 0 ){
+            classes[xstart] = classnumber++;
+        }
+    }
+    for( int i = 0; i < classes.size(); ++i ){
+        printf("%d\t", classes[i] );
     }
     printf("\n");
 }
