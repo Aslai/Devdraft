@@ -107,7 +107,7 @@ int compute( Field f ) {
     return maxval;
 }
 
-int main() {
+int problem2() {
     #ifdef USE_FILESTREAMS
     freopen( "input.txt", "r", stdin );
     freopen( "output.txt", "w", stdout );
